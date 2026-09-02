@@ -51,12 +51,16 @@ def main():
         idx += 1
     for i, ((start, end, _), png) in enumerate(zip(cues, pngs)):
         inputs += ["-i", str(png)]
-        label = "vout" if i == len(cues) - 1 else f"v{i}"
+        label = f"v{i}"
         overlays.append(
             f"[{prev}][{idx}:v]overlay=0:0:enable='between(t,{start},{end})'[{label}]"
         )
         prev = label
         idx += 1
+    # Normalize video PTS to start at 0. Source cuts often leave the first video
+    # packet at start_time ~1 frame (e.g. 0.033s) while audio starts at 0;
+    # QuickTime renders that gap as a black poster/first frame.
+    overlays.append(f"[{prev}]setpts=PTS-STARTPTS[vout]")
 
     cmd = (
         ["ffmpeg", "-y", "-v", "error"]

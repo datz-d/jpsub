@@ -75,9 +75,12 @@ python3 ~/.claude/skills/jpsub/scripts/burn.py <video> <workdir>/cues.json <work
 `<video名>_JPsub.mp4` と `check1-4.jpg`（キュー中間点のフレーム）が出る。crf 18 / 音声copy / faststart。
 元動画の頭に黒フレームが残る場合は `--trim-start <秒>` で頭を切る（キュー時刻は自動シフト。1フレーム=約0.042s @23.976fps）。
 
+**黒ファーストフレーム対策(組み込み済み)**: ffmpegで切り出した素材はvideoのstart_timeが約1フレーム(例: 0.033s@30fps)ずれ、audioが0秒のままになることがある。QuickTime等はこの隙間を黒で埋めてポスターにするため「1フレーム目が黒い」ように見える(ffmpegのフレーム抽出では黒フレームが見えないので気づきにくい)。burn.pyは出力時に `setpts=PTS-STARTPTS` で映像PTSを0始まりに正規化してこれを防ぐ。
+
 ### 7. QA（自己判定で完了にしない）
 
 - `check*.jpg` を目視（文字切れ・2行超え・グラデの濃さ）
+- `ffprobe -v error -show_entries stream=codec_type,start_time -of compact <出力>` で**videoのstart_time=0を確認**(0.03等ならQuickTimeで頭が黒く見える)。ffmpegのフレーム抽出だけでQA完了にしない
 - ユーザーにcheckフレームを提示して確認を待つ
 - 修正指示が来たら: cues.json修正 → `--only` で該当PNGだけ再レンダ → burn.py再実行
 
