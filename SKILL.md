@@ -73,7 +73,7 @@ headless Chromeで透過PNG化。フォントはHiragino Sans W6、サイズはm
 python3 ~/.claude/skills/jpsub/scripts/make_credit.py -w W -H H -o <workdir>/credit.png [--pos tr|tl] [--text "翻訳：事業家のDNA（DeNA公式）"]
 ```
 
-ロゴ(既定=dena/brand/dna_logo_bubble.png)+一行テキストの透過PNG。右上(tr)既定。burn.pyに `--credit <workdir>/credit.png` を渡すと全尺オーバーレイ。2026-09-08 Giantクリップで導入。
+ロゴ(既定=dena/brand/dna_logo_reverse.png 白反転)+小さな役割語「訳・字幕」の透過PNG(書籍の「〇〇 訳」型)。右上・端から60px(1080p基準、EBU R95の5%安全域)・ロゴ高58px・文字16px字間.14em・不透明度.88・背景なし。`--layout under` で縦積み(縦動画向き)。burn.pyに `--credit <workdir>/credit.png` を渡すと全尺オーバーレイ。調査資産=dena/brand/credit_research/(実例30本の実測)。2026-09-09確定。
 
 ### 6. 焼き込み
 
