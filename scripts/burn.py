@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Burn subtitle PNG overlays (plus optional bottom gradient) into a video.
 
-Usage: burn.py <video> <cues.json> <png_dir> [-o out.mp4] [--gradient g.png] [--prefix c]
+Usage: burn.py <video> <cues.json> <png_dir> [-o out.mp4] [--gradient g.png] [--credit credit.png] [--prefix c]
 
-Encodes with libx264 crf 18, audio copied, faststart.
+Encodes with the Ulysses settings: libx264 crf 18, audio copied, faststart.
 Also extracts 4 evenly spaced check frames (at cue midpoints) next to the output.
 """
 import argparse
@@ -27,6 +27,7 @@ def main():
     p.add_argument("-o", "--out")
     p.add_argument("--gradient")
     p.add_argument("--prefix", default="c")
+    p.add_argument("--credit", help="full-frame transparent PNG overlaid for the whole duration (e.g. translator credit badge from make_credit.py)")
     p.add_argument("--trim-start", type=float, default=0.0,
                    help="cut this many seconds off the head (e.g. black lead-in frames); cue times are shifted to match")
     a = p.parse_args()
@@ -48,6 +49,11 @@ def main():
         inputs += ["-i", a.gradient]
         overlays.append(f"[{prev}][{idx}:v]overlay=0:0[g]")
         prev = "g"
+        idx += 1
+    if a.credit:
+        inputs += ["-i", a.credit]
+        overlays.append(f"[{prev}][{idx}:v]overlay=0:0[cr]")
+        prev = "cr"
         idx += 1
     for i, ((start, end, _), png) in enumerate(zip(cues, pngs)):
         inputs += ["-i", str(png)]
